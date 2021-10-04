@@ -9,6 +9,7 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -64,6 +65,7 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "/getOrders", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	  @PreAuthorize("hasRole('ROLE_ADMIN')")
 	public ResponseEntity<List<OrderResource>> getOrders() {
 		List<Order> orders = orderService.getOrders();
 		if (orders.isEmpty()) {
@@ -74,12 +76,14 @@ public class OrderController {
 	}
 
 	@RequestMapping(value = "/getOrdersByClient", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	  @PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<List<OrderResource>> getOrdersByClient(@RequestBody Client client) {
 		List<Order> orders = orderService.getOrdersByClient(client);
 		return new ResponseEntity<>(mapperService.mapOrderListDetails(orders), HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/getOrderbyId/{order_number}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	  @PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<OrderResource> getOrder(@Valid @PathVariable("order_number") String orderNumber) {
 		Order order = orderService.getOrder(orderNumber);
 		if (order == null) {
